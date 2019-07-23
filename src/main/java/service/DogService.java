@@ -1,28 +1,32 @@
 package service;
 
+import lombok.Getter;
 import model.Dog;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static java.util.Arrays.asList;
 
 @Service
 public class DogService {
-    private static Long id = 3L;
+    private static AtomicLong id = new AtomicLong(3);
 
-    private static List<Dog> dogsCollection = new ArrayList<>(asList(
+    @Getter
+    private static List<Dog> dogsCollection = Collections.synchronizedList(new ArrayList<>(asList(
             new Dog().setId(1L).setName("bobik").setHeight(123).setWeight(12.4),
             new Dog().setId(2L).setName("sharick").setHeight(89).setWeight(8.9))
-    );
+    ));
 
     public Dog findById(Long id) {
         return dogsCollection.stream().filter(d -> d.getId().equals(id)).findFirst().orElse(null);
     }
 
     public Dog createDog(Dog dog) {
-        dogsCollection.add(dog.setId(id++));
+        dogsCollection.add(dog.setId(id.getAndIncrement()));
         return dog;
     }
 

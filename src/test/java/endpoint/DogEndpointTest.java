@@ -1,6 +1,7 @@
 package endpoint;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.module.mockmvc.specification.MockMvcRequestSpecification;
 import model.Dog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -13,10 +14,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import service.DogService;
 
-import java.util.Date;
-
 import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static org.hamcrest.CoreMatchers.containsString;
+import static io.qala.datagen.RandomShortApi.*;
 import static org.testng.Assert.*;
 
 @WebAppConfiguration
@@ -26,67 +25,80 @@ public class DogEndpointTest extends AbstractTestNGSpringContextTests {
     private WebApplicationContext context;
     @Autowired
     private DogService dogService;
-
-    private MockMvc mockMvc;
+    private MockMvcRequestSpecification request;
 
     @BeforeClass
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        request = given().mockMvc(mockMvc).contentType(ContentType.JSON);
     }
 
     @Test
     public void getsDogById() {
-        given().mockMvc(mockMvc).when().get("/dog/1").then().statusCode(200)
-                .body(containsString("bobik"));
+        Dog expectedDog = dogService.createDog(randomDog());
+        Dog dog = request.get("/dog/{id}", expectedDog.getId()).then().statusCode(200)
+                .extract().body().as(Dog.class);
+        assertDogsEquals(dog, expectedDog);
     }
 
     @Test
     public void returns404_ifDogIsNotFound() {
-        given().mockMvc(mockMvc).when().get("/dog/999").then().statusCode(404);
+        request.get("/dog/{id}", integer(1000, 2000)).then().statusCode(404);
     }
 
     @Test
     public void createsDog() {
-        Dog dog = new Dog().setName("Name").setWeight(23.5).setDate(new Date());
-        Dog actualDog = given().mockMvc(mockMvc).contentType(ContentType.JSON).body(dog)
-                .when().post("/dog").then().statusCode(200).extract().body().as(Dog.class);
-        assertNotNull(actualDog.getId());
-        assertEquals(dog.getName(), actualDog.getName());
+        Dog dog = randomDog();
+        Dog createdDog = request.body(dog).post("/dog").then().statusCode(200).extract().body().as(Dog.class);
+        assertDogsEquals(createdDog, dog);
     }
 
     @Test
     public void overridesIdWhenCreatesDog() {
-        Dog dog = new Dog().setId(1L).setName("Name").setWeight(23.5).setDate(new Date());
-        Dog actualDog = given().mockMvc(mockMvc).contentType(ContentType.JSON).body(dog)
-                .when().post("/dog").then().statusCode(200).extract().body().as(Dog.class);
-        assertNotEquals(dog.getId(), actualDog.getId());
+        Dog dog = randomDog().setId(positiveLong());
+        Dog actualDog = request.body(dog).post("/dog").then().statusCode(200).extract().body().as(Dog.class);
+        assertNotEquals(actualDog.getId(), dog.getId());
+        assertDogsEquals(actualDog, dog);
     }
 
     @Test
     public void removesDog() {
-        given().mockMvc(mockMvc).when().delete("/dog/2").then().statusCode(200);
-        assertNull(dogService.findById(2L));
+        Dog dog = dogService.createDog(randomDog());
+        request.delete("/dog/{id}", dog.getId()).then().statusCode(200);
+        assertNull(dogService.findById(dog.getId()));
     }
 
     @Test
     public void returns404_ifDogForDeletionIsNotFound() {
-        given().mockMvc(mockMvc).when().delete("/dog/111").then().statusCode(404);
+        request.delete("/dog/{id}", integer(900, 9000)).then().statusCode(404);
     }
 
     @Test
     public void updatesExistingDog() {
-        Dog dog = new Dog().setName("Name").setWeight(23.5).setDate(new Date());
-        Dog actualDog = given().mockMvc(mockMvc).contentType(ContentType.JSON).body(dog)
-                .when().put("/dog/1").then().statusCode(200).extract().body().as(Dog.class);
-        assertEquals(1L, actualDog.getId().longValue());
+        Dog dog = randomDog();
+        Dog updatedDog = request.body(dog).put("/dog/{id}", 1).then().statusCode(200).extract().body().as(Dog.class);
+        assertEquals(1L, updatedDog.getId().longValue());
+        assertDogsEquals(updatedDog, dog);
     }
 
     @Test
-    public void createsNewDogForUpdatingNotPound() {
-        Dog dog = new Dog().setName("Name").setWeight(23.5).setDate(new Date());
-        Dog actualDog = given().mockMvc(mockMvc).contentType(ContentType.JSON).body(dog)
-                .when().put("/dog/111").then().statusCode(200).extract().body().as(Dog.class);
-        assertNotEquals(111L, actualDog.getId());
+    public void createsNewDog_ifDogForUpdatingNotFound() {
+        Dog dog = randomDog();
+        int randomId = integer(1000, 2000);
+        Dog actualDog = request.body(dog).put("/dog/{id}", randomId).then().statusCode(200).extract().body().as(Dog.class);
+        assertNotEquals(randomId, actualDog.getId());
         assertNotNull(actualDog.getId());
+        assertDogsEquals(actualDog, dog);
+    }
+
+    private static Dog randomDog() {
+        return new Dog().setName(english(6)).setWeight(positiveDouble());
+    }
+
+    private static void assertDogsEquals(Dog actualDog, Dog expectedDog) {
+        assertEquals(actualDog.getName(), expectedDog.getName());
+        assertEquals(actualDog.getDate(), expectedDog.getDate());
+        assertEquals(actualDog.getHeight(), expectedDog.getHeight());
+        assertEquals(actualDog.getWeight(), expectedDog.getWeight());
     }
 }
