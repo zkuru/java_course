@@ -20,7 +20,7 @@ import static org.testng.Assert.*;
 
 @WebAppConfiguration
 @ContextConfiguration("classpath:test-context.xml")
-public class DogEndpointTest extends AbstractTestNGSpringContextTests {
+public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private WebApplicationContext context;
     @Autowired
