@@ -6,10 +6,11 @@ import org.testng.annotations.Test;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.util.Date;
 import java.util.Set;
 
+import static io.qala.datagen.RandomShortApi.Double;
+import static io.qala.datagen.RandomShortApi.*;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -18,8 +19,7 @@ public class DogTest {
 
     @BeforeClass
     public static void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
@@ -33,7 +33,7 @@ public class DogTest {
 
     @Test
     public void validationFails_ifNameExceedsMaxSize() {
-        Dog dog = new Dog().setName("AaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaaAaaaaaaaa");
+        Dog dog = new Dog().setName(english(110));
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
         String message = "size must be between 0 and 100";
         assertEquals(1, constraintViolations.size());
@@ -41,9 +41,23 @@ public class DogTest {
     }
 
     @Test
+    public void validationPasses_ifNameSizeIs100() {
+        Dog dog = new Dog().setName(english(100));
+        Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
+        assertEquals(0, constraintViolations.size());
+    }
+
+    @Test
+    public void validationPasses_ifNameLessThen100() {
+        Dog dog = new Dog().setName(english(10));
+        Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
+        assertEquals(0, constraintViolations.size());
+    }
+
+    @Test
     public void validationFails_ifDateIsAfterNow() {
         long today = new Date().getTime();
-        Dog dog = new Dog().setName("asd").setDate(new Date(today + 1000000));
+        Dog dog = new Dog().setName(english(3)).setDate(new Date(today + 1000000));
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
         String message = "must be a past date";
         assertEquals(1, constraintViolations.size());
@@ -52,31 +66,38 @@ public class DogTest {
 
     @Test
     public void validationPasses_ifDateIsNull() {
-        Dog dog = new Dog().setName("asd");
+        Dog dog = new Dog().setName(english(3));
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
         assertEquals(0, constraintViolations.size());
     }
 
     @Test
-    public void validationPasses_ifNameLessThen100() {
-        Dog dog = new Dog().setName("asd");
+    public void validationPasses_ifDateIsBeforeNow() {
+        Dog dog = new Dog().setName(english(3)).setDate(new Date(1));
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
         assertEquals(0, constraintViolations.size());
     }
 
     @Test
     public void validationFails_ifHeightIsNegative() {
-        Dog dog = new Dog().setName("asd").setHeight(0);
+        Dog dog = new Dog().setName(english(3)).setHeight(integer(-100, -1));
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
 
         String message = "must be greater than 0";
         assertEquals(1, constraintViolations.size());
         assertHasMessage(constraintViolations, message);
+    }
+
+    @Test
+    public void validationPasses_ifHeightIsPositive() {
+        Dog dog = new Dog().setName(english(3)).setHeight(positiveInteger());
+        Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
+        assertEquals(0, constraintViolations.size());
     }
 
     @Test
     public void validationFails_ifWeightIsNegative() {
-        Dog dog = new Dog().setName("asd").setWeight(-2.4);
+        Dog dog = new Dog().setName(english(3)).setWeight(Double(-100, -1));
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
         String message = "must be greater than 0";
         assertEquals(1, constraintViolations.size());
@@ -84,8 +105,8 @@ public class DogTest {
     }
 
     @Test
-    public void validationPasses_ifAllFieldsValid() {
-        Dog dog = new Dog().setName("asd").setDate(new Date(1000)).setHeight(1).setWeight(3.3);
+    public void validationPasses_ifWeightIsPositive() {
+        Dog dog = new Dog().setName(english(3)).setWeight(positiveDouble());
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
         assertEquals(0, constraintViolations.size());
     }
