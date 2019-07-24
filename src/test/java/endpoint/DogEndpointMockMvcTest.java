@@ -19,7 +19,7 @@ import static io.qala.datagen.RandomShortApi.*;
 import static org.testng.Assert.*;
 
 @WebAppConfiguration
-@ContextConfiguration("classpath:test-context.xml")
+@ContextConfiguration("classpath:spring-web-servlet.xml")
 public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private WebApplicationContext context;
