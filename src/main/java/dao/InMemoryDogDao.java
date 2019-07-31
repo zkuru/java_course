@@ -1,8 +1,7 @@
-package service;
+package dao;
 
 import lombok.Getter;
 import model.Dog;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,8 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static java.util.Arrays.asList;
 
-@Service
-public class DogService {
+public class InMemoryDogDao {
     private static AtomicLong id = new AtomicLong(3);
 
     @Getter

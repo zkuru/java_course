@@ -25,21 +25,21 @@ public class DogEndpointRestAssuredTest {
     @Test
     public void createsDog() {
         Dog dog = randomDog();
-        Dog createdDog = requestWithBody(dog).post("/dog").then().statusCode(200).extract().body().as(Dog.class);
+        Dog createdDog = requestWithBody(dog).post("/dog").then().statusCode(201).extract().body().as(Dog.class);
         assertDogsEquals(createdDog, dog);
     }
 
     @Test
     public void overridesIdWhenCreatesDog() {
         Dog dog = randomDog().setId(positiveLong());
-        Dog actualDog = requestWithBody(dog).post("/dog").then().statusCode(200).extract().body().as(Dog.class);
+        Dog actualDog = requestWithBody(dog).post("/dog").then().statusCode(201).extract().body().as(Dog.class);
         assertNotEquals(actualDog.getId(), dog.getId());
         assertDogsEquals(actualDog, dog);
     }
 
     @Test
     public void removesDog() {
-        Dog dog = requestWithBody(randomDog()).post("/dog").then().statusCode(200).extract().body().as(Dog.class);
+        Dog dog = requestWithBody(randomDog()).post("/dog").then().statusCode(201).extract().body().as(Dog.class);
         delete("/dog/{id}", dog.getId()).then().statusCode(200);
         get("dog/{id}", dog.getId()).then().statusCode(404);
     }

@@ -19,7 +19,7 @@
         <lombok.version>1.18.8</lombok.version>
         <testng.version>6.8.8</testng.version>
         <servlet-api.version>3.1.0</servlet-api.version>
-        <javax-el.version>3.0.1-b08</javax-el.version>
+        <tomcat-el.version>9.0.20</tomcat-el.version>
         <qala-datagen.version>2.3.0</qala-datagen.version>
     </properties>
 
@@ -102,9 +102,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>${javax-el.version}</version>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jasper-el</artifactId>
+            <version>${tomcat-el.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
