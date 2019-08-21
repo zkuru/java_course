@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+    <bean id="dogEndpoint" class="endpoint.DogEndpoint">
+        <constructor-arg ref="jdbcDogDao"/>
+    </bean>
 
     <bean id="dogDao" class="dao.InMemoryDogDao"/>
-    <bean id="dogEndpoint" class="endpoint.DogEndpoint">
-        <constructor-arg type="dao.InMemoryDogDao" ref="dogDao"/>
+
+    <bean id="jdbcDogDao" class="dao.JdbcDogDao" >
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
+        <property name="url" value="jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1" />
+        <property name="user" value="sa" />
+        <property name="password" value="" />
     </bean>
 
     <mvc:annotation-driven>

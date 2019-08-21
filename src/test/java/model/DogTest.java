@@ -9,7 +9,6 @@ import javax.validation.Validator;
 import java.util.Date;
 import java.util.Set;
 
-import static io.qala.datagen.RandomShortApi.Double;
 import static io.qala.datagen.RandomShortApi.*;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
@@ -97,7 +96,7 @@ public class DogTest {
 
     @Test
     public void validationFails_ifWeightIsNegative() {
-        Dog dog = new Dog().setName(english(3)).setWeight(Double(-100, -1));
+        Dog dog = new Dog().setName(english(3)).setWeight(integer(-100, -1));
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
         String message = "must be greater than 0";
         assertEquals(1, constraintViolations.size());
@@ -106,7 +105,7 @@ public class DogTest {
 
     @Test
     public void validationPasses_ifWeightIsPositive() {
-        Dog dog = new Dog().setName(english(3)).setWeight(positiveDouble());
+        Dog dog = new Dog().setName(english(3)).setWeight(positiveInteger());
         Set<ConstraintViolation<Dog>> constraintViolations = validator.validate(dog);
         assertEquals(0, constraintViolations.size());
     }

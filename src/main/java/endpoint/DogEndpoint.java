@@ -1,9 +1,8 @@
 package endpoint;
 
-import dao.InMemoryDogDao;
+import dao.DogDao;
 import lombok.RequiredArgsConstructor;
 import model.Dog;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +12,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @RequestMapping(path = "/dog")
 public class DogEndpoint {
-    private final InMemoryDogDao dogDao;
+    private final DogDao dogDao;
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Dog> getDog(@Valid @PathVariable Long id) {
@@ -30,8 +29,11 @@ public class DogEndpoint {
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Dog> deleteDog(@PathVariable Long id) {
-        Dog dog = dogDao.deleteDog(id);
-        return dog == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(dog);
+        Dog dog = dogDao.findById(id);
+        if (dog == null)
+            return ResponseEntity.notFound().build();
+        dogDao.deleteDog(id);
+        return ResponseEntity.ok(dog);
     }
 
     @PutMapping("/{id}")

@@ -72,7 +72,7 @@ public class DogEndpointRestAssuredTest {
     }
 
     private static Dog randomDog() {
-        return new Dog().setName(english(6)).setWeight(positiveDouble());
+        return new Dog().setName(english(6)).setWeight(positiveInteger());
     }
 
     private static void assertDogsEquals(Dog actualDog, Dog expectedDog) {

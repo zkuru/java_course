@@ -2,7 +2,7 @@ package endpoint;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.module.mockmvc.specification.MockMvcRequestSpecification;
-import dao.InMemoryDogDao;
+import dao.DogDao;
 import model.Dog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,7 +24,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private WebApplicationContext context;
     @Autowired
-    private InMemoryDogDao dogDao;
+    private DogDao jdbcDogDao;
     private MockMvcRequestSpecification request;
 
     @BeforeClass
@@ -35,7 +35,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void getsDogById() {
-        Dog expectedDog = dogDao.createDog(randomDog());
+        Dog expectedDog = jdbcDogDao.createDog(randomDog());
         Dog dog = request.get("/dog/{id}", expectedDog.getId()).then().statusCode(200)
                 .extract().body().as(Dog.class);
         assertDogsEquals(dog, expectedDog);
@@ -63,9 +63,9 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void removesDog() {
-        Dog dog = dogDao.createDog(randomDog());
+        Dog dog = jdbcDogDao.createDog(randomDog());
         request.delete("/dog/{id}", dog.getId()).then().statusCode(200);
-        assertNull(dogDao.findById(dog.getId()));
+        assertNull(jdbcDogDao.findById(dog.getId()));
     }
 
     @Test
@@ -75,9 +75,10 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void updatesExistingDog() {
+        Dog expectedDog = jdbcDogDao.createDog(randomDog());
         Dog dog = randomDog();
-        Dog updatedDog = request.body(dog).put("/dog/{id}", 1).then().statusCode(200).extract().body().as(Dog.class);
-        assertEquals(1L, updatedDog.getId().longValue());
+        Dog updatedDog = request.body(dog).put("/dog/{id}", expectedDog.getId()).then().statusCode(200).extract().body().as(Dog.class);
+        assertEquals(updatedDog.getId(), expectedDog.getId());
         assertDogsEquals(updatedDog, dog);
     }
 
@@ -98,13 +99,13 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     }
 
     private static Dog randomDog() {
-        return new Dog().setName(english(6)).setWeight(positiveDouble());
+        return new Dog().setName(english(6)).setWeight(positiveInteger());
     }
 
     private static void assertDogsEquals(Dog actualDog, Dog expectedDog) {
         assertEquals(actualDog.getName(), expectedDog.getName());
         assertEquals(actualDog.getDate(), expectedDog.getDate());
         assertEquals(actualDog.getHeight(), expectedDog.getHeight());
-        assertEquals(actualDog.getWeight(), expectedDog.getWeight());
+        assertEquals(actualDog.getWeight(), expectedDog.getWeight(), 0.0001);
     }
 }

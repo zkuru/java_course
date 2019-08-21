@@ -8,15 +8,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static io.qala.datagen.RandomShortApi.integer;
 import static java.util.Arrays.asList;
 
-public class InMemoryDogDao {
+public class InMemoryDogDao implements DogDao {
     private static AtomicLong id = new AtomicLong(3);
 
     @Getter
     private static List<Dog> dogsCollection = Collections.synchronizedList(new ArrayList<>(asList(
-            new Dog().setId(1L).setName("bobik").setHeight(123).setWeight(12.4),
-            new Dog().setId(2L).setName("sharick").setHeight(89).setWeight(8.9))
+            new Dog().setId(1L).setName("bobik").setHeight(123).setWeight(integer()),
+            new Dog().setId(2L).setName("sharick").setHeight(89).setWeight(integer()))
     ));
 
     public Dog findById(Long id) {
@@ -28,10 +29,9 @@ public class InMemoryDogDao {
         return dog;
     }
 
-    public Dog deleteDog(Long id) {
+    public void deleteDog(Long id) {
         Dog dog = findById(id);
         dogsCollection.remove(dog);
-        return dog;
     }
 
     public Dog updateDog(Long id, Dog updatedDog) {
