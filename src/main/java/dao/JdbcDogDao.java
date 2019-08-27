@@ -2,8 +2,8 @@ package dao;
 
 import lombok.RequiredArgsConstructor;
 import model.Dog;
-import org.h2.jdbcx.JdbcDataSource;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.ZoneId;
 
@@ -11,7 +11,7 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 @RequiredArgsConstructor
 public class JdbcDogDao implements DogDao {
-    private final JdbcDataSource dataSource;
+    private final DataSource dataSource;
 
     @Override
     public Dog findById(Long id) {
@@ -44,8 +44,9 @@ public class JdbcDogDao implements DogDao {
             statement.setObject(3, dog.getHeight(), Types.INTEGER);
             statement.setObject(4, dog.getWeight(), Types.INTEGER);
             statement.executeUpdate();
-            if (statement.getGeneratedKeys().next())
-                dog.setId(statement.getGeneratedKeys().getLong(1));
+            ResultSet resultSet = statement.getGeneratedKeys();
+            if (resultSet.next())
+                dog.setId(resultSet.getLong(1));
         } catch (SQLException e) {
             e.printStackTrace();
         }

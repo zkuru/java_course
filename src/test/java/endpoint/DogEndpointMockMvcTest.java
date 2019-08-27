@@ -99,7 +99,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     }
 
     private static Dog randomDog() {
-        return new Dog().setName(english(6)).setWeight(positiveInteger());
+        return new Dog().setName(english(6)).setWeight(integer(0, 100));
     }
 
     private static void assertDogsEquals(Dog actualDog, Dog expectedDog) {
