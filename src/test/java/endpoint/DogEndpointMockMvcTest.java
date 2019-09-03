@@ -5,9 +5,7 @@ import com.jayway.restassured.module.mockmvc.specification.MockMvcRequestSpecifi
 import dao.DogDao;
 import model.Dog;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -18,8 +16,7 @@ import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.qala.datagen.RandomShortApi.*;
 import static org.testng.Assert.*;
 
-@WebAppConfiguration
-@ContextConfiguration("classpath:spring-web-servlet.xml")
+@ComponentTest
 public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private WebApplicationContext context;

@@ -4,38 +4,57 @@
        xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-    <bean id="dogEndpoint" class="endpoint.DogEndpoint">
-        <constructor-arg ref="jdbcDogDao"/>
-    </bean>
+    <beans profile="dev">
+        <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
+            <property name="url" value="jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1" />
+            <property name="user" value="sa"/>
+            <property name="password" value=""/>
+        </bean>
+    </beans>
 
-    <bean id="dogDao" class="dao.InMemoryDogDao"/>
+    <beans profile="prod">
+        <bean id="dataSource" class="com.mysql.cj.jdbc.MysqlDataSource">
+            <property name="url" value="jdbc:mysql://localhost:3306/javaCourse"/>
+            <property name="useServerPrepStmts" value="true"/>
+            <property name="user" value="user" />
+            <property name="password" value="password" />
+            <property name="allowPublicKeyRetrieval" value="true"/>
+            <property name="cachePrepStmts" value="true"/>
+            <property name="prepStmtCacheSize" value="1"/>
+            <property name="prepStmtCacheSqlLimit" value="2048"/>
+            <property name="sslMode" value="disabled"/>
+        </bean>
+    </beans>
 
-    <bean id="jdbcDogDao" class="dao.JdbcDogDao" >
-        <constructor-arg ref="dataSource"/>
-    </bean>
+    <beans>
+        <bean id="dogEndpoint" class="endpoint.DogEndpoint">
+            <constructor-arg ref="jdbcDogDao"/>
+        </bean>
 
-    <bean id="imMemoryDataSource" class="org.h2.jdbcx.JdbcDataSource">
-        <property name="url" value="jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1" />
-        <property name="user" value="sa"/>
-        <property name="password" value=""/>
-    </bean>
+        <bean id="dogDao" class="dao.InMemoryDogDao"/>
 
-    <bean id="dataSource" class="com.mysql.cj.jdbc.MysqlDataSource">
-        <property name="url" value="jdbc:mysql://localhost:3306/javaCourse" />
-        <property name="user" value="user" />
-        <property name="password" value="password" />
-        <property name="sslMode" value="disabled"/>
-    </bean>
+        <bean id="jdbcDogDao" class="dao.JdbcDogDao" >
+            <constructor-arg ref="dataSource"/>
+        </bean>
 
-    <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
-        <property name="baselineOnMigrate" value="true"/>
-        <property name="dataSource" ref="dataSource"/>
-        <property name="locations" value="classpath:db/migration"/>
-    </bean>
+        <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+            <property name="baselineOnMigrate" value="true"/>
+            <property name="dataSource" ref="dataSource"/>
+            <property name="locations" value="classpath:db/migration"/>
+        </bean>
 
-    <mvc:annotation-driven>
-        <mvc:message-converters>
-            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
-        </mvc:message-converters>
-    </mvc:annotation-driven>
+        <mvc:annotation-driven>
+            <mvc:message-converters>
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+            </mvc:message-converters>
+        </mvc:annotation-driven>
+    </beans>
+
+    <!--<bean name="dataSource" class="org.postgresql.ds.PGSimpleDataSource">-->
+        <!--<property name="url" value="jdbc:postgresql://localhost:5432/postgres" />-->
+        <!--<property name="user" value="raya" />-->
+        <!--<property name="password" value="12345678" />-->
+        <!--<property name="preparedStatementCacheQueries" value="2"/>-->
+    <!--</bean>-->
+
 </beans>
