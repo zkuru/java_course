@@ -28,6 +28,10 @@
 
     <beans>
         <bean id="dogEndpoint" class="endpoint.DogEndpoint">
+            <constructor-arg ref="dogService"/>
+        </bean>
+
+        <bean id="dogService" class="service.DogServiceImpl">
             <constructor-arg ref="jdbcDogDao"/>
         </bean>
 
