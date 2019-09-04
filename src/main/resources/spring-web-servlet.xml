@@ -38,6 +38,10 @@
         <bean id="dogDao" class="dao.InMemoryDogDao"/>
 
         <bean id="jdbcDogDao" class="dao.JdbcDogDao" >
+            <constructor-arg ref="connectionHolder"/>
+        </bean>
+
+        <bean id="connectionHolder" class="utils.JdbcConnectionHolder" >
             <constructor-arg ref="dataSource"/>
         </bean>
 

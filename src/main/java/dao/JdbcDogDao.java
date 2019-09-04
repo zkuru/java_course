@@ -2,8 +2,8 @@ package dao;
 
 import lombok.RequiredArgsConstructor;
 import model.Dog;
+import utils.JdbcConnectionHolder;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.time.ZoneId;
 
@@ -11,11 +11,11 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 @RequiredArgsConstructor
 public class JdbcDogDao implements DogDao {
-    private final DataSource dataSource;
+    private final JdbcConnectionHolder connectionHolder;
 
     @Override
     public Dog findById(Long id) {
-        try (Connection connection = dataSource.getConnection()) {
+        try (Connection connection = connectionHolder.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM DOG where id = ?");
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -38,7 +38,7 @@ public class JdbcDogDao implements DogDao {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-            connection = dataSource.getConnection();
+            connection = connectionHolder.getConnection();
             connection.setAutoCommit(false);
             statement = connection.prepareStatement(
                     "INSERT INTO DOG (name, date, height, weight) values (?, ?, ?, ?)", RETURN_GENERATED_KEYS);
@@ -66,7 +66,7 @@ public class JdbcDogDao implements DogDao {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-            connection = dataSource.getConnection();
+            connection = connectionHolder.getConnection();
             connection.setAutoCommit(false);
             statement = connection.prepareStatement("DELETE FROM DOG where id = ?");
             statement.setLong(1, id);
@@ -85,7 +85,7 @@ public class JdbcDogDao implements DogDao {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-            connection = dataSource.getConnection();
+            connection = connectionHolder.getConnection();
             connection.setAutoCommit(false);
             statement = connection.prepareStatement("UPDATE DOG SET name = ?, date = ?, height = ?, weight = ? where id = ?");
             statement.setString(1, updatedDog.getName());
