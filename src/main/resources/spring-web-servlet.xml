@@ -28,6 +28,11 @@
 
     <beans>
         <bean id="dogEndpoint" class="endpoint.DogEndpoint">
+            <constructor-arg ref="transactionalDogService"/>
+        </bean>
+
+        <bean id="transactionalDogService" class="service.TransactionalDogService">
+            <constructor-arg ref="connectionHolder"/>
             <constructor-arg ref="dogService"/>
         </bean>
 
@@ -65,5 +70,4 @@
         <!--<property name="password" value="12345678" />-->
         <!--<property name="preparedStatementCacheQueries" value="2"/>-->
     <!--</bean>-->
-
 </beans>

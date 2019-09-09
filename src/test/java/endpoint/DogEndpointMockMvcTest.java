@@ -21,7 +21,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private WebApplicationContext context;
     @Autowired
-    private DogService dogService;
+    private DogService transactionalDogService;
     private MockMvcRequestSpecification request;
 
     @BeforeClass
@@ -32,7 +32,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void getsDogById() {
-        Dog expectedDog = dogService.createDog(randomDog());
+        Dog expectedDog = transactionalDogService.createDog(randomDog());
         Dog dog = request.get("/dog/{id}", expectedDog.getId()).then().statusCode(200)
                 .extract().body().as(Dog.class);
         assertDogsEquals(dog, expectedDog);
@@ -60,9 +60,9 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void removesDog() {
-        Dog dog = dogService.createDog(randomDog());
+        Dog dog = transactionalDogService.createDog(randomDog());
         request.delete("/dog/{id}", dog.getId()).then().statusCode(200);
-        assertNull(dogService.findById(dog.getId()));
+        assertNull(transactionalDogService.findById(dog.getId()));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void updatesExistingDog() {
-        Dog expectedDog = dogService.createDog(randomDog());
+        Dog expectedDog = transactionalDogService.createDog(randomDog());
         Dog dog = randomDog();
         Dog updatedDog = request.body(dog).put("/dog/{id}", expectedDog.getId()).then().statusCode(200).extract().body().as(Dog.class);
         assertEquals(updatedDog.getId(), expectedDog.getId());
