@@ -11,7 +11,7 @@ import static io.qala.datagen.RandomShortApi.*;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("h2")
 @ContextConfiguration("classpath:spring-web-servlet.xml")
 public class JdbcDogDaoTest extends AbstractTestNGSpringContextTests {
     // TODO

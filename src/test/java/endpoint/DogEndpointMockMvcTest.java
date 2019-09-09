@@ -2,7 +2,6 @@ package endpoint;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.module.mockmvc.specification.MockMvcRequestSpecification;
-import dao.DogDao;
 import model.Dog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -11,6 +10,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import service.DogService;
 
 import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.qala.datagen.RandomShortApi.*;
@@ -21,7 +21,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private WebApplicationContext context;
     @Autowired
-    private DogDao jdbcDogDao;
+    private DogService dogService;
     private MockMvcRequestSpecification request;
 
     @BeforeClass
@@ -32,7 +32,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void getsDogById() {
-        Dog expectedDog = jdbcDogDao.createDog(randomDog());
+        Dog expectedDog = dogService.createDog(randomDog());
         Dog dog = request.get("/dog/{id}", expectedDog.getId()).then().statusCode(200)
                 .extract().body().as(Dog.class);
         assertDogsEquals(dog, expectedDog);
@@ -60,9 +60,9 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void removesDog() {
-        Dog dog = jdbcDogDao.createDog(randomDog());
+        Dog dog = dogService.createDog(randomDog());
         request.delete("/dog/{id}", dog.getId()).then().statusCode(200);
-        assertNull(jdbcDogDao.findById(dog.getId()));
+        assertNull(dogService.findById(dog.getId()));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void updatesExistingDog() {
-        Dog expectedDog = jdbcDogDao.createDog(randomDog());
+        Dog expectedDog = dogService.createDog(randomDog());
         Dog dog = randomDog();
         Dog updatedDog = request.body(dog).put("/dog/{id}", expectedDog.getId()).then().statusCode(200).extract().body().as(Dog.class);
         assertEquals(updatedDog.getId(), expectedDog.getId());

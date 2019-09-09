@@ -12,13 +12,33 @@ public class JdbcConnectionHolder {
     private final DataSource dataSource;
 
     public Connection getConnection() {
-        if (connection.get() == null) {
-            try {
+        try {
+            if (connection.get() == null || connection.get().isClosed())
                 connection.set(dataSource.getConnection());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return connection.get();
+    }
+
+    public void closeConnection() {
+        Connection connection = getConnection();
+        try {
+            if (connection != null)
+                connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void rollBack() {
+        Connection connection = getConnection();
+        if (connection != null) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
     }
 }
