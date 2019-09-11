@@ -21,7 +21,7 @@ public class TransactionalProxyAnnotationBeanPostProcessor implements BeanPostPr
     public Object postProcessAfterInitialization(final Object bean, String beanName) throws BeansException {
         Class<?> beanClass = bean.getClass();
         for (Method method : bean.getClass().getMethods()) {
-            if (method.isAnnotationPresent(TransactionalProxy.class))
+            if (method.isAnnotationPresent(CustomTransactional.class))
                 return Proxy.newProxyInstance(beanClass.getClassLoader(), beanClass.getInterfaces(), new TransactionalInvocationHandler(bean));
         }
         return bean;
@@ -34,10 +34,14 @@ public class TransactionalProxyAnnotationBeanPostProcessor implements BeanPostPr
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Connection connection;
+            Object result = null;
+            Method originalMethod = bean.getClass().getMethod(method.getName(), method.getParameterTypes());
+            if (!originalMethod.isAnnotationPresent(CustomTransactional.class))
+                return originalMethod.invoke(bean, args);
             try {
                 connection = connectionHolder.getConnection();
                 connection.setAutoCommit(false);
-                method.invoke(bean, args);
+                result = method.invoke(bean, args);
                 connection.commit();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -45,8 +49,7 @@ public class TransactionalProxyAnnotationBeanPostProcessor implements BeanPostPr
             } finally {
                 connectionHolder.closeConnection();
             }
-            return bean;
+            return result;
         }
     }
-
 }

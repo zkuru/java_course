@@ -28,7 +28,7 @@
 
     <beans>
         <bean id="dogEndpoint" class="endpoint.DogEndpoint">
-            <constructor-arg ref="transactionalDogService"/>
+            <constructor-arg ref="dogService"/>
         </bean>
 
         <bean id="transactionalDogService" class="service.TransactionalDogService">
