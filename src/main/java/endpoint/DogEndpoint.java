@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import model.Dog;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import service.DogService;
+import service.DogServiceImpl;
 
 import javax.validation.Valid;
 
@@ -12,7 +12,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @RequestMapping(path = "/dog")
 public class DogEndpoint {
-    private final DogService dogService;
+    private final DogServiceImpl dogService;
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Dog> getDog(@Valid @PathVariable Long id) {

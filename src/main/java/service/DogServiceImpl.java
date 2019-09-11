@@ -1,33 +1,31 @@
 package service;
 
 import dao.JdbcDogDao;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import model.Dog;
-import utils.CustomTransactional;
+import utils.CGLibTransactional;
 
-@RequiredArgsConstructor
-public class DogServiceImpl implements DogService {
-    private final JdbcDogDao dogDao;
+@NoArgsConstructor
+@AllArgsConstructor
+public class DogServiceImpl {
+    private JdbcDogDao dogDao;
 
-    @Override
     public Dog findById(Long id) {
         return dogDao.findById(id);
     }
 
-    @Override
-    @CustomTransactional
+    @CGLibTransactional
     public Dog createDog(Dog dog) {
         return dogDao.createDog(dog);
     }
 
-    @Override
-    @CustomTransactional
+    @CGLibTransactional
     public void deleteDog(Long id) {
         dogDao.deleteDog(id);
     }
 
-    @Override
-    @CustomTransactional
+    @CGLibTransactional
     public Dog updateDog(Long id, Dog dog) {
         return dogDao.updateDog(id, dog);
     }

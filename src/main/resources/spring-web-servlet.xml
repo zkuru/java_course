@@ -31,11 +31,6 @@
             <constructor-arg ref="dogService"/>
         </bean>
 
-        <bean id="transactionalDogService" class="service.TransactionalDogService">
-            <!--<constructor-arg ref="connectionHolder"/>-->
-            <constructor-arg ref="dogService"/>
-        </bean>
-
         <bean id="dogService" class="service.DogServiceImpl">
             <constructor-arg ref="jdbcDogDao"/>
         </bean>
@@ -57,6 +52,10 @@
         </bean>
 
         <bean class="utils.TransactionalProxyAnnotationBeanPostProcessor">
+            <constructor-arg ref="connectionHolder"/>
+        </bean>
+
+        <bean class="utils.CglibTransactionalDogService">
             <constructor-arg ref="connectionHolder"/>
         </bean>
 
