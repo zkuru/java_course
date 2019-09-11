@@ -3,12 +3,10 @@ package service;
 import dao.JdbcDogDao;
 import lombok.RequiredArgsConstructor;
 import model.Dog;
-import utils.JdbcConnectionHolder;
 
 @RequiredArgsConstructor
 public class DogServiceImpl implements DogService {
     private final JdbcDogDao dogDao;
-    private final JdbcConnectionHolder connectionHolder;
 
     @Override
     public Dog findById(Long id) {

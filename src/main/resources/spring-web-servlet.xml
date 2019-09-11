@@ -32,12 +32,11 @@
         </bean>
 
         <bean id="transactionalDogService" class="service.TransactionalDogService">
-            <constructor-arg ref="connectionHolder"/>
+            <!--<constructor-arg ref="connectionHolder"/>-->
             <constructor-arg ref="dogService"/>
         </bean>
 
         <bean id="dogService" class="service.DogServiceImpl">
-            <constructor-arg ref="connectionHolder"/>
             <constructor-arg ref="jdbcDogDao"/>
         </bean>
 
@@ -55,6 +54,10 @@
             <property name="baselineOnMigrate" value="true"/>
             <property name="dataSource" ref="dataSource"/>
             <property name="locations" value="classpath:db/migration"/>
+        </bean>
+
+        <bean class="utils.TransactionalProxyAnnotationBeanPostProcessor">
+            <constructor-arg ref="connectionHolder"/>
         </bean>
 
         <mvc:annotation-driven>
