@@ -27,8 +27,7 @@ public class CglibTransactionalDogService implements BeanPostProcessor {
             if (method.isAnnotationPresent(CGLibTransactional.class)) {
                 Enhancer enhancer = new Enhancer();
                 enhancer.setSuperclass(beanClass);
-                enhancer.setCallback(new TransactionalInvocationHandler());
-                // TODO inject dogDao
+                enhancer.setCallback(new TransactionalInvocationHandler(bean, connectionHolder));
                 return enhancer.create();
             }
         }
@@ -37,22 +36,23 @@ public class CglibTransactionalDogService implements BeanPostProcessor {
 
     @RequiredArgsConstructor
     private class TransactionalInvocationHandler implements MethodInterceptor {
-
+        private final Object bean;
+        private final JdbcConnectionHolder connectionHolder;
 
         @Override
         public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
             Connection connection;
             Object result = null;
-            if (!method.isAnnotationPresent(JDKTransactional.class))
-                return methodProxy.invokeSuper(o, args);
+            if (!method.isAnnotationPresent(CGLibTransactional.class))
+                return method.invoke(bean, args);
             try {
                 connection = connectionHolder.getConnection();
                 connection.setAutoCommit(false);
-                result = methodProxy.invokeSuper(o, args);
+                result = method.invoke(bean, args);
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
                 connectionHolder.rollBack();
+                throw new RuntimeException(e);
             } finally {
                 connectionHolder.closeConnection();
             }

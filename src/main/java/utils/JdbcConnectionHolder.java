@@ -16,28 +16,28 @@ public class JdbcConnectionHolder {
             if (connection.get() == null || connection.get().isClosed())
                 connection.set(dataSource.getConnection());
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return connection.get();
     }
 
-    public void closeConnection() {
+    void closeConnection() {
         Connection connection = getConnection();
         try {
             if (connection != null)
                 connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    public void rollBack() {
+    void rollBack() {
         Connection connection = getConnection();
         if (connection != null) {
             try {
                 connection.rollback();
             } catch (SQLException e1) {
-                e1.printStackTrace();
+                throw new RuntimeException(e1);
             }
         }
     }

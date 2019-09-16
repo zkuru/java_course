@@ -44,8 +44,8 @@ public class TransactionalProxyAnnotationBeanPostProcessor implements BeanPostPr
                 result = method.invoke(bean, args);
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
                 connectionHolder.rollBack();
+                throw new RuntimeException(e);
             } finally {
                 connectionHolder.closeConnection();
             }
