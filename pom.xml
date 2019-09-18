@@ -22,6 +22,8 @@
         <tomcat-el.version>9.0.20</tomcat-el.version>
         <qala-datagen.version>2.3.0</qala-datagen.version>
         <h2.version>1.4.197</h2.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -40,6 +42,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
             <version>${spring.version}</version>
         </dependency>
 
@@ -148,6 +156,12 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
             <version>1.8.2</version>
         </dependency>
     </dependencies>

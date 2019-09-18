@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import model.Dog;
 import utils.CGLibTransactional;
+import utils.CustomTransactional;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class DogServiceImpl {
         return dogDao.findById(id);
     }
 
-    @CGLibTransactional
+    @CustomTransactional
     public Dog createDog(Dog dog) {
         return dogDao.createDog(dog);
     }

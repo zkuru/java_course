@@ -2,7 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd http://www.springframework.org/schema/aop
+     http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
     <beans profile="h2">
         <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
@@ -58,6 +60,17 @@
         <bean class="utils.CglibTransactionalDogService">
             <constructor-arg ref="connectionHolder"/>
         </bean>
+
+        <bean name="transactionalAdvice" class="utils.TransactionalAdvice">
+            <constructor-arg ref="connectionHolder"/>
+        </bean>
+
+        <aop:config>
+            <aop:aspect ref="transactionalAdvice">
+                <aop:pointcut id="methodWithTransaction" expression="@annotation(utils.CustomTransactional)"/>
+                <aop:around method="addTransactionSupport" pointcut-ref="methodWithTransaction"/>
+            </aop:aspect>
+        </aop:config>
 
         <mvc:annotation-driven>
             <mvc:message-converters>
