@@ -9,7 +9,7 @@ import utils.CustomTransactional;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class DogServiceImpl {
+public class DogServiceImpl implements DogService{
     private JdbcDogDao dogDao;
 
     public Dog findById(Long id) {
