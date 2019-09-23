@@ -188,10 +188,13 @@
                             </includes>
                         </source>
                     </sources>
+                    <weaveDirectories>
+                        <weaveDirectory>${project.build.directory}/classes</weaveDirectory>
+                    </weaveDirectories>
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>process-sources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>compile</goal>
                             <goal>test-compile</goal>
@@ -201,5 +204,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
