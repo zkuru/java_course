@@ -4,30 +4,29 @@ import dao.JdbcDogDao;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import model.Dog;
-import utils.CGLibTransactional;
-import utils.CustomTransactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class DogServiceImpl implements DogService{
+public class DogServiceImpl implements DogService {
     private JdbcDogDao dogDao;
 
-    @CustomTransactional
+    @Transactional(readOnly = true)
     public Dog findById(Long id) {
         return dogDao.findById(id);
     }
 
-    @CustomTransactional
+    @Transactional
     public Dog createDog(Dog dog) {
         return dogDao.createDog(dog);
     }
 
-    @CGLibTransactional
+    @Transactional
     public void deleteDog(Long id) {
         dogDao.deleteDog(id);
     }
 
-    @CGLibTransactional
+    @Transactional
     public Dog updateDog(Long id, Dog dog) {
         return dogDao.updateDog(id, dog);
     }
