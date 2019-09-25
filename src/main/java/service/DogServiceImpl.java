@@ -12,6 +12,7 @@ import utils.CustomTransactional;
 public class DogServiceImpl implements DogService{
     private JdbcDogDao dogDao;
 
+    @CustomTransactional
     public Dog findById(Long id) {
         return dogDao.findById(id);
     }

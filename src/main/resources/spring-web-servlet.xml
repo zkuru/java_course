@@ -2,13 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd http://www.springframework.org/schema/aop
-     http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+     http://www.springframework.org/schema/aop/spring-aop-3.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <beans profile="h2">
         <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-            <property name="url" value="jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1" />
+            <property name="url" value="jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1"/>
             <property name="user" value="sa"/>
             <property name="password" value=""/>
         </bean>
@@ -18,8 +18,8 @@
         <bean id="dataSource" class="com.mysql.cj.jdbc.MysqlDataSource">
             <property name="url" value="jdbc:mysql://localhost:3306/javaCourse"/>
             <property name="useServerPrepStmts" value="true"/>
-            <property name="user" value="user" />
-            <property name="password" value="password" />
+            <property name="user" value="user"/>
+            <property name="password" value="password"/>
             <property name="allowPublicKeyRetrieval" value="true"/>
             <property name="cachePrepStmts" value="true"/>
             <property name="prepStmtCacheSize" value="1"/>
@@ -39,11 +39,11 @@
 
         <bean id="dogDao" class="dao.InMemoryDogDao"/>
 
-        <bean id="jdbcDogDao" class="dao.JdbcDogDao" >
+        <bean id="jdbcDogDao" class="dao.JdbcDogDao">
             <constructor-arg ref="connectionHolder"/>
         </bean>
 
-        <bean id="connectionHolder" class="utils.JdbcConnectionHolder" >
+        <bean id="connectionHolder" class="utils.JdbcConnectionHolder">
             <constructor-arg ref="dataSource"/>
         </bean>
 
@@ -65,11 +65,20 @@
             <constructor-arg ref="connectionHolder"/>
         </bean>
 
+        <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="dataSource"/>
+        </bean>
+
+        <tx:advice id="txAdvice" transaction-manager="txManager">
+            <tx:attributes>
+                <tx:method name="*"/>
+                <tx:method name="find*" read-only="true"/>
+            </tx:attributes>
+        </tx:advice>
+
         <aop:config>
-            <aop:aspect ref="transactionalAdvice">
-                <aop:pointcut id="methodWithTransaction" expression="@annotation(utils.CustomTransactional)"/>
-                <aop:around method="addTransactionSupport" pointcut-ref="methodWithTransaction"/>
-            </aop:aspect>
+            <aop:pointcut id="methodWithTransaction" expression="@annotation(utils.CustomTransactional)"/>
+            <aop:advisor advice-ref="txAdvice" pointcut-ref="methodWithTransaction"/>
         </aop:config>
 
         <mvc:annotation-driven>
@@ -78,11 +87,4 @@
             </mvc:message-converters>
         </mvc:annotation-driven>
     </beans>
-
-    <!--<bean name="dataSource" class="org.postgresql.ds.PGSimpleDataSource">-->
-        <!--<property name="url" value="jdbc:postgresql://localhost:5432/postgres" />-->
-        <!--<property name="user" value="raya" />-->
-        <!--<property name="password" value="12345678" />-->
-        <!--<property name="preparedStatementCacheQueries" value="2"/>-->
-    <!--</bean>-->
 </beans>
