@@ -2,87 +2,67 @@ package dao;
 
 import lombok.RequiredArgsConstructor;
 import model.Dog;
-import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.time.ZoneId;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 @RequiredArgsConstructor
 public class JdbcDogDao implements DogDao {
-    private final DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Dog findById(Long id) {
-        try {
-            Connection connection = DataSourceUtils.getConnection(dataSource);
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM DOG where id = ?");
-            statement.setLong(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                long dogId = resultSet.getLong(1);
-                String name = resultSet.getString(2);
-                Date date = resultSet.getDate(3);
-                Integer height = resultSet.getObject(4, Integer.class);
-                Integer weight = resultSet.getObject(5, Integer.class);
-                return new Dog().setId(dogId).setName(name).setDate(date).setHeight(height).setWeight(weight);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM DOG where id = ?",
+                (rs, rowNum) -> {
+                    long dogId = rs.getLong(1);
+                    String name = rs.getString(2);
+                    Date date = rs.getDate(3);
+                    Integer height = rs.getObject(4, Integer.class);
+                    Integer weight = rs.getObject(5, Integer.class);
+                    return new Dog().setId(dogId).setName(name).setDate(date).setHeight(height).setWeight(weight);
+                }, id));
     }
 
     @Override
     public Dog createDog(Dog dog) {
-        try {
-            Connection connection = DataSourceUtils.getConnection(dataSource);
-            PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO DOG (name, date, height, weight) values (?, ?, ?, ?)", RETURN_GENERATED_KEYS);
-            statement.setString(1, dog.getName());
-            statement.setDate(2, dog.getDate() == null ? null
-                    : Date.valueOf(dog.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
-            statement.setObject(3, dog.getHeight(), Types.INTEGER);
-            statement.setObject(4, dog.getWeight(), Types.INTEGER);
-            statement.executeUpdate();
-            ResultSet resultSet = statement.getGeneratedKeys();
-            if (resultSet.next())
-                dog.setId(resultSet.getLong(1));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return dog;
+        KeyHolder holder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO DOG (name, date, height, weight) " +
+                    "values (?, ?, ?, ?)", RETURN_GENERATED_KEYS);
+            return preparedStatement(dog, statement);
+        }, holder);
+        return dog.setId(holder.getKey().longValue());
     }
 
     @Override
     public void deleteDog(Long id) {
-        try {
-            Connection connection = DataSourceUtils.getConnection(dataSource);
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM DOG where id = ?");
-            statement.setLong(1, id);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        jdbcTemplate.update("DELETE FROM DOG where id = ?", id);
     }
 
     @Override
     public Dog updateDog(Long id, Dog updatedDog) {
-        try {
-            Connection connection = DataSourceUtils.getConnection(dataSource);
-            PreparedStatement statement = connection.prepareStatement("UPDATE DOG SET name = ?, date = ?, height = ?, weight = ? where id = ?");
-            statement.setString(1, updatedDog.getName());
-            statement.setDate(2, updatedDog.getDate() == null ? null
-                    : Date.valueOf(updatedDog.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
-            statement.setObject(3, updatedDog.getHeight(), Types.INTEGER);
-            statement.setObject(4, updatedDog.getWeight(), Types.INTEGER);
-            statement.setLong(5, id);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        jdbcTemplate.update("UPDATE DOG SET name = ?, date = ?, height = ?, weight = ? where id = ?",
+                statement -> {
+                    preparedStatement(updatedDog, statement).setLong(5, id);
+                });
         return updatedDog.setId(id);
+    }
+
+    private PreparedStatement preparedStatement(Dog dog, PreparedStatement statement) throws SQLException {
+        statement.setString(1, dog.getName());
+        statement.setDate(2, dog.getDate() == null ? null
+                : Date.valueOf(dog.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+        statement.setObject(3, dog.getHeight(), Types.INTEGER);
+        statement.setObject(4, dog.getWeight(), Types.INTEGER);
+        return statement;
     }
 }

@@ -40,7 +40,11 @@
         <bean id="dogDao" class="dao.InMemoryDogDao"/>
 
         <bean id="jdbcDogDao" class="dao.JdbcDogDao">
-            <constructor-arg ref="dataSource"/>
+            <constructor-arg ref="jdbcTemplate"/>
+        </bean>
+
+        <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+            <property name="dataSource" ref="dataSource"/>
         </bean>
 
         <bean id="connectionHolder" class="utils.JdbcConnectionHolder">
