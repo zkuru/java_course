@@ -2,29 +2,29 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd http://www.springframework.org/schema/aop
-     http://www.springframework.org/schema/aop/spring-aop-3.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <beans profile="h2">
-        <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-            <property name="url" value="jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1"/>
+        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+            <property name="driverClass" value = "org.h2.Driver" />
+            <property name="jdbcUrl" value="jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1"/>
             <property name="user" value="sa"/>
             <property name="password" value=""/>
+            <property name="maxPoolSize" value="20" />
+            <property name="minPoolSize" value="5" />
         </bean>
     </beans>
 
     <beans profile="mySql">
-        <bean id="dataSource" class="com.mysql.cj.jdbc.MysqlDataSource">
-            <property name="url" value="jdbc:mysql://localhost:3306/javaCourse"/>
-            <property name="useServerPrepStmts" value="true"/>
+        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+            <property name="driverClass" value = "com.mysql.cj.jdbc.Driver"/>
+            <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/javaCourse"/>
             <property name="user" value="user"/>
             <property name="password" value="password"/>
-            <property name="allowPublicKeyRetrieval" value="true"/>
-            <property name="cachePrepStmts" value="true"/>
-            <property name="prepStmtCacheSize" value="1"/>
-            <property name="prepStmtCacheSqlLimit" value="2048"/>
-            <property name="sslMode" value="disabled"/>
+            <property name="maxPoolSize" value="20"/>
+            <property name="minPoolSize" value="5"/>
         </bean>
     </beans>
 
