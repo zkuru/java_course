@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <beans profile="h2">
-        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-            <property name="driverClass" value = "org.h2.Driver" />
-            <property name="jdbcUrl" value="jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1"/>
-            <property name="user" value="sa"/>
-            <property name="password" value=""/>
-            <property name="maxPoolSize" value="20" />
-            <property name="minPoolSize" value="5" />
-        </bean>
-    </beans>
+    <context:property-placeholder location="classpath:db.properties"/>
 
-    <beans profile="mySql">
-        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-            <property name="driverClass" value = "com.mysql.cj.jdbc.Driver"/>
-            <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/javaCourse"/>
-            <property name="user" value="user"/>
-            <property name="password" value="password"/>
-            <property name="maxPoolSize" value="20"/>
-            <property name="minPoolSize" value="5"/>
-        </bean>
-    </beans>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="user" value="${db.user}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="maxPoolSize" value="${db.maxPoolSize}"/>
+        <property name="minPoolSize" value="${db.minPoolSize}"/>
+        <property name="maxStatements" value="${db.maxStatements}"/>
+        <property name="maxStatementsPerConnection" value="${db.maxStatementsPerConnection}"/>
+        <property name="testConnectionOnCheckout" value="true"/>
+        <property name="testConnectionOnCheckin" value="true"/>
+    </bean>
 
     <beans>
         <bean id="dogEndpoint" class="endpoint.DogEndpoint">
