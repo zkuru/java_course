@@ -1,0 +1,16 @@
+add to server.xml
+<Resource name="db/h2"
+          global="db/h2"
+          auth="Container"
+          type="javax.sql.DataSource"
+          driverClassName="org.h2.Driver"
+          url="jdbc:h2:tcp://localhost/~/test"
+          username="sa"
+          password=""/>
+
+
+add to context.xml
+<ResourceLink name="db/h2"
+                  global="db/h2"
+                  auth="Container"
+                  type="javax.sql.DataSource"/>

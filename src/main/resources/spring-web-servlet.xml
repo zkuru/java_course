@@ -8,21 +8,7 @@
 
     <context:property-placeholder location="classpath:db.properties"/>
 
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <property name="jdbcUrl" value="${db.url}"/>
-        <property name="user" value="${db.user}"/>
-        <property name="password" value="${db.password}"/>
-        <property name="maxPoolSize" value="${db.maxPoolSize}"/>
-        <property name="minPoolSize" value="${db.minPoolSize}"/>
-        <property name="maxStatements" value="${db.maxStatements}"/>
-        <property name="maxStatementsPerConnection" value="${db.maxStatementsPerConnection}"/>
-        <property name="testConnectionOnCheckout" value="false"/>
-        <property name="testConnectionOnCheckin" value="true"/>
-        <property name="idleConnectionTestPeriod" value="60"/>
-        <property name="checkoutTimeout" value="30000"/>
-        <property name="unreturnedConnectionTimeout" value="4"/>
-        <property name="debugUnreturnedConnectionStackTraces" value="true"/>
-    </bean>
+    <bean id="dataSource" class="utils.JndiDataSourceFactoryBean"/>
 
     <beans>
         <bean id="dogEndpoint" class="endpoint.DogEndpoint">
