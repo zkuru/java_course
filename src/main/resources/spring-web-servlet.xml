@@ -16,8 +16,12 @@
         <property name="minPoolSize" value="${db.minPoolSize}"/>
         <property name="maxStatements" value="${db.maxStatements}"/>
         <property name="maxStatementsPerConnection" value="${db.maxStatementsPerConnection}"/>
-        <property name="testConnectionOnCheckout" value="true"/>
+        <property name="testConnectionOnCheckout" value="false"/>
         <property name="testConnectionOnCheckin" value="true"/>
+        <property name="idleConnectionTestPeriod" value="60"/>
+        <property name="checkoutTimeout" value="30000"/>
+        <property name="unreturnedConnectionTimeout" value="4"/>
+        <property name="debugUnreturnedConnectionStackTraces" value="true"/>
     </bean>
 
     <beans>
