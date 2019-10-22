@@ -1,6 +1,6 @@
 package service;
 
-import dao.JdbcDogDao;
+import dao.DogDao;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import model.Dog;
@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DogServiceImpl implements DogService {
-    private JdbcDogDao dogDao;
+    private DogDao dogDao;
 
     @Transactional(readOnly = true)
     public Dog findById(Long id) {

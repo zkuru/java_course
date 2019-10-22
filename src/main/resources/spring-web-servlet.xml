@@ -3,65 +3,93 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jee="http://www.springframework.org/schema/jee"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd">
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:property-placeholder location="classpath:db.properties"/>
 
-    <jee:jndi-lookup id="dataSource" jndi-name="db/h2" expected-type="javax.sql.DataSource"/>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="user" value="${db.user}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="maxPoolSize" value="${db.maxPoolSize}"/>
+        <property name="minPoolSize" value="${db.minPoolSize}"/>
+        <property name="maxStatements" value="${db.maxStatements}"/>
+        <property name="maxStatementsPerConnection" value="${db.maxStatementsPerConnection}"/>
+        <property name="testConnectionOnCheckout" value="false"/>
+        <property name="testConnectionOnCheckin" value="true"/>
+        <property name="idleConnectionTestPeriod" value="60"/>
+        <property name="checkoutTimeout" value="30000"/>
+        <property name="unreturnedConnectionTimeout" value="4"/>
+        <property name="debugUnreturnedConnectionStackTraces" value="true"/>
+    </bean>
 
-    <beans>
-        <bean id="dogEndpoint" class="endpoint.DogEndpoint">
-            <constructor-arg ref="dogService"/>
-        </bean>
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mappingResources" value="hbn.mappings/Dog.hbn.xml"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
 
-        <bean id="dogService" class="service.DogServiceImpl">
-            <constructor-arg ref="jdbcDogDao"/>
-        </bean>
+    <bean id="hibernateDogDao" class="dao.HibernateDogDao">
+        <constructor-arg ref="sessionFactory"/>
+    </bean>
 
-        <bean id="dogDao" class="dao.InMemoryDogDao"/>
+    <bean id="dogEndpoint" class="endpoint.DogEndpoint">
+        <constructor-arg ref="dogService"/>
+    </bean>
 
-        <bean id="jdbcDogDao" class="dao.JdbcDogDao">
-            <constructor-arg ref="jdbcTemplate"/>
-        </bean>
+    <bean id="dogService" class="service.DogServiceImpl">
+        <constructor-arg ref="hibernateDogDao"/>
+    </bean>
 
-        <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-            <property name="dataSource" ref="dataSource"/>
-        </bean>
+    <bean id="dogDao" class="dao.InMemoryDogDao"/>
 
-        <bean id="connectionHolder" class="utils.JdbcConnectionHolder">
-            <constructor-arg ref="dataSource"/>
-        </bean>
+    <bean id="jdbcDogDao" class="dao.JdbcDogDao">
+        <constructor-arg ref="jdbcTemplate"/>
+    </bean>
 
-        <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
-            <property name="baselineOnMigrate" value="true"/>
-            <property name="dataSource" ref="dataSource"/>
-            <property name="locations" value="classpath:db/migration"/>
-        </bean>
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
 
-        <bean class="utils.TransactionalProxyAnnotationBeanPostProcessor">
-            <constructor-arg ref="connectionHolder"/>
-        </bean>
+    <bean id="connectionHolder" class="utils.JdbcConnectionHolder">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 
-        <bean class="utils.CglibTransactionalDogService">
-            <constructor-arg ref="connectionHolder"/>
-        </bean>
+    <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+        <property name="baselineOnMigrate" value="true"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="locations" value="classpath:db/migration"/>
+    </bean>
 
-        <bean name="transactionalAdvice" class="utils.TransactionalAdvice">
-            <constructor-arg ref="connectionHolder"/>
-        </bean>
+    <bean class="utils.TransactionalProxyAnnotationBeanPostProcessor">
+        <constructor-arg ref="connectionHolder"/>
+    </bean>
 
-        <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-            <property name="dataSource" ref="dataSource"/>
-        </bean>
+    <bean class="utils.CglibTransactionalDogService">
+        <constructor-arg ref="connectionHolder"/>
+    </bean>
 
-        <tx:annotation-driven transaction-manager="txManager"/>
+    <bean name="transactionalAdvice" class="utils.TransactionalAdvice">
+        <constructor-arg ref="connectionHolder"/>
+    </bean>
 
-        <mvc:annotation-driven>
-            <mvc:message-converters>
-                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
-            </mvc:message-converters>
-        </mvc:annotation-driven>
-    </beans>
+    <bean id="txManager"
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 </beans>
