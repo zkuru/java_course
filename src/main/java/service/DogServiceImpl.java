@@ -27,7 +27,7 @@ public class DogServiceImpl implements DogService {
     }
 
     @Transactional
-    public Dog updateDog(Long id, Dog dog) {
-        return dogDao.updateDog(id, dog);
+    public Dog updateDog(Dog dog) {
+        return dogDao.updateDog(dog);
     }
 }

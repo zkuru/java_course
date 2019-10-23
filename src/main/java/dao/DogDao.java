@@ -9,5 +9,5 @@ public interface DogDao {
 
     void deleteDog(Long id);
 
-    Dog updateDog(Long id, Dog updatedDog);
+    Dog updateDog(Dog updatedDog);
 }

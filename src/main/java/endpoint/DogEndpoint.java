@@ -43,6 +43,6 @@ public class DogEndpoint {
     @Log
     @PutMapping("/{id}")
     public ResponseEntity<Dog> updateDog(@PathVariable Long id, @Valid @RequestBody Dog updatedDog) {
-        return ResponseEntity.ok(dogService.updateDog(id, updatedDog));
+        return ResponseEntity.ok(dogService.updateDog(updatedDog.setId(id)));
     }
 }

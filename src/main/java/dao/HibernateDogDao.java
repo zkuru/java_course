@@ -22,20 +22,14 @@ public class HibernateDogDao implements DogDao {
 
     @Override
     public void deleteDog(Long id) {
-        session().createQuery("delete from Dog where id = :id")
-                .setParameter("id", id).executeUpdate();
+        Dog dog = session().load(Dog.class, id);
+        session().remove(dog);
     }
 
     @Override
-    public Dog updateDog(Long id, Dog updatedDog) {
-        session().createQuery("update Dog set name = :name, date = :date, height = :height, weight = :weight " + "where id = :id")
-                .setParameter("id", id)
-                .setParameter("name", updatedDog.getName())
-                .setParameter("date", updatedDog.getDate())
-                .setParameter("height", updatedDog.getHeight())
-                .setParameter("weight", updatedDog.getWeight())
-                .executeUpdate();
-        return updatedDog.setId(id);
+    public Dog updateDog(Dog updatedDog) {
+        session().saveOrUpdate(updatedDog);
+        return updatedDog;
     }
 
     private Session session() {

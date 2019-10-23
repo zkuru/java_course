@@ -49,12 +49,12 @@ public class JdbcDogDao implements DogDao {
     }
 
     @Override
-    public Dog updateDog(Long id, Dog updatedDog) {
+    public Dog updateDog(Dog updatedDog) {
         jdbcTemplate.update("UPDATE DOG SET name = ?, date = ?, height = ?, weight = ? where id = ?",
                 statement -> {
-                    preparedStatement(updatedDog, statement).setLong(5, id);
+                    preparedStatement(updatedDog, statement).setLong(5, updatedDog.getId());
                 });
-        return updatedDog.setId(id);
+        return updatedDog;
     }
 
     private PreparedStatement preparedStatement(Dog dog, PreparedStatement statement) throws SQLException {

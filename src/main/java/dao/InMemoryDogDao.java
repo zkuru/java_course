@@ -34,8 +34,8 @@ public class InMemoryDogDao implements DogDao {
         dogsCollection.remove(dog);
     }
 
-    public Dog updateDog(Long id, Dog updatedDog) {
-        Dog dog = findById(id);
+    public Dog updateDog(Dog updatedDog) {
+        Dog dog = findById(updatedDog.getId());
         if (dog == null)
             return createDog(updatedDog);
         else
