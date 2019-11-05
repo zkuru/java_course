@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="model.Award" table="AWARD">
+        <id name="id" column="ID" type="java.lang.Long">
+            <generator class="identity"/>
+        </id>
+        <property name="title" column="TITLE" type="java.lang.String"/>
+        <property name="nomination" column="NOMINATION" type="java.lang.String"/>
+    </class>
+</hibernate-mapping>

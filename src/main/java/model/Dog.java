@@ -9,6 +9,8 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,4 +30,6 @@ public class Dog {
 
     @Positive
     Integer weight;
+
+    Set<Award> awards = new HashSet<>();
 }

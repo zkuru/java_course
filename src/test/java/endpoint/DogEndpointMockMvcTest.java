@@ -2,6 +2,7 @@ package endpoint;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.module.mockmvc.specification.MockMvcRequestSpecification;
+import model.Award;
 import model.Dog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -32,10 +33,12 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void getsDogById() {
-        Dog expectedDog = dogService.createDog(randomDog());
-        Dog dog = request.get("/dog/{id}", expectedDog.getId()).then().statusCode(200)
-                .extract().body().as(Dog.class);
-        assertDogsEquals(dog, expectedDog);
+        Dog expectedDog = randomDog();
+        expectedDog.getAwards().add(randomAward());
+        dogService.createDog(expectedDog);
+        Dog foundDog = request.get("/dog/{id}", expectedDog.getId()).then().statusCode(200).extract().body().as(Dog.class);
+        assertDogsEquals(expectedDog, foundDog);
+        assertFalse(foundDog.getAwards().isEmpty());
     }
 
     @Test
@@ -96,7 +99,11 @@ public class DogEndpointMockMvcTest extends AbstractTestNGSpringContextTests {
     }
 
     private static Dog randomDog() {
-        return new Dog().setName(english(6)).setWeight(integer(0, 100));
+        return new Dog().setName(english(6)).setWeight(integer(1, 100));
+    }
+
+    private static Award randomAward() {
+        return new Award().setTitle(alphanumeric(10)).setNomination("Good boy");
     }
 
     private static void assertDogsEquals(Dog actualDog, Dog expectedDog) {

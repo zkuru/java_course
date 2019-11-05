@@ -5,13 +5,19 @@ import model.Dog;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class HibernateDogDao implements DogDao {
     private final SessionFactory sessionFactory;
 
     @Override
     public Dog findById(Long id) {
-        return session().get(Dog.class, id);
+        List<Dog> resultList = session().createQuery("from Dog d left join fetch d.awards where d.id = :id", Dog.class)
+                .setParameter("id", id).getResultList();
+        if (!resultList.isEmpty())
+            return resultList.get(0);
+        return null;
     }
 
     @Override

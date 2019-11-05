@@ -11,5 +11,11 @@
         <property name="date" column="DATE" type="java.util.Date"/>
         <property name="height" column="HEIGHT" type="java.lang.Integer"/>
         <property name="weight" column="WEIGHT" type="java.lang.Integer" />
+        <set name="awards" table="AWARD" lazy="true" cascade="save-update">
+            <key>
+                <column name="dog_id" not-null="true" />
+            </key>
+            <one-to-many class="model.Award" />
+        </set>
     </class>
 </hibernate-mapping>
