@@ -15,7 +15,7 @@
         <spring-mock-mvc.version>2.9.0</spring-mock-mvc.version>
         <restassured.version>2.9.0</restassured.version>
         <javax-validation.version>2.0.1.Final</javax-validation.version>
-        <hibernate-validator.version>6.0.14.Final</hibernate-validator.version>
+        <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
         <lombok.version>1.18.8</lombok.version>
         <testng.version>6.8.8</testng.version>
         <servlet-api.version>3.1.0</servlet-api.version>
